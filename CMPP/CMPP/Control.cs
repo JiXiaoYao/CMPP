@@ -52,6 +52,13 @@ namespace CMPP
                 }
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Listen">网络终结</param>
+        /// <param name="SocketID"></param>
+        /// <param name="Context"></param>
+        /// <param name="Legth"></param>
         public void ClientMessage(IPEndPoint Listen, long SocketID, byte[] Context, int Legth)
         {
             string ContextMessage = Encoding.UTF8.GetString(Context, 0, Legth);                    // 转为字符串
@@ -63,7 +70,7 @@ namespace CMPP
                 {
                     string PacketContext = MessagePacket[i] + "<DataEnd>";                         // 生成完整的一个数据包
                     byte[] MessageInfo = Packet.Unpack(PacketContext);                             // 拆包
-                    string MessageContext = Encoding.UTF8.GetString(MessageInfo);                  // 恢复数据包
+                    string MessageContext = Encoding.UTF8.GetString(MessageInfo);                  // 恢复数据包 
                     if (MessageContext.Contains("},{"))
                     {
                         #region 映射通信
@@ -98,7 +105,10 @@ namespace CMPP
                     else
                     {
                         #region C/S通信
-                        // 
+                        // { 科指令 } {次级指令} {3级指令}   {参数}
+                        // : Longin Null Null User=Admin&Psw=Admin   返回：1:Longin 200 OK Null      2:Longin 400 Error Info=密码错误
+                        // : Select Map TCP Null                     返回：Admin Map List IPEndPoint={x.x.x.x:xxx},{y.y.y.y:yyy}
+                        // : Map TCP Null IPEndPoint={x.x.x.x:xxx},{y.y.y.y:yyy},{z.z.z.z:zzz}     返回：Map Return Null Info=“x.x.x.x:xxx”成功 “y.y.y.y:yyy”成功 “z.z.z.z:zzz”失败：原因，无权限
                         string[] MCtt = MessageContext.Split(' ');
 
                         #endregion
