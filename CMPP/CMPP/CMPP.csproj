@@ -3,6 +3,18 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
+    <StartupObject>CMPP.Program</StartupObject>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <Optimize>true</Optimize>
+    <DocumentationFile>bin\Debug\netcoreapp2.0\CMPP.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="TCPCS">
+      <HintPath>..\..\..\TCP-IP\TCP·IP\bin\Debug\netcoreapp2.0\TCPCS.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 
 </Project>
