@@ -24,7 +24,7 @@ namespace CMPP
         /// <param name="ListenPort"></param>
         public Control(IPAddress ListenIP, int ListenPort)
         {
-            TcpServer = new TCPCS.Server(new IPAddress[] { ListenIP }, ListenPort, 4096, true);
+            TcpServer = new Server(new IPAddress[] { ListenIP }, ListenPort, 4096, true);
             TcpServer.ClientConnent += NewConnet;
             TcpServer.ClientMessages += ClientMessage;
             TcpServer.ConnentStop += ConnetStop;
@@ -55,11 +55,11 @@ namespace CMPP
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="Listen">网络终结</param>
+        /// <param name="ListenEndPoint"></param>
         /// <param name="SocketID"></param>
         /// <param name="Context"></param>
         /// <param name="Legth"></param>
-        public void ClientMessage(IPEndPoint Listen, long SocketID, byte[] Context, int Legth)
+        public void ClientMessage(IPEndPoint ListenEndPoint, long SocketID, byte[] Context, int Legth)
         {
             string ContextMessage = Encoding.UTF8.GetString(Context, 0, Legth);                    // 转为字符串
             MessageBufferZone = MessageBufferZone + Context;                                       // 添加到缓冲区
@@ -105,12 +105,35 @@ namespace CMPP
                     else
                     {
                         #region C/S通信
-                        // { 科指令 } {次级指令} {3级指令}   {参数}
-                        // : Longin Null Null User=Admin&Psw=Admin   返回：1:Longin 200 OK Null      2:Longin 400 Error Info=密码错误
-                        // : Select Map TCP Null                     返回：Admin Map List IPEndPoint={x.x.x.x:xxx},{y.y.y.y:yyy}
+                        // : Longin User=Admin&Psw=Admin   返回：1:Longin 200 OK Null      2:Longin 400 Error Info=密码错误
+                        // : Select Map TCP                     返回：Admin Map List IPEndPoint={x.x.x.x:xxx},{y.y.y.y:yyy}
                         // : Map TCP Null IPEndPoint={x.x.x.x:xxx},{y.y.y.y:yyy},{z.z.z.z:zzz}     返回：Map Return Null Info=“x.x.x.x:xxx”成功 “y.y.y.y:yyy”成功 “z.z.z.z:zzz”失败：原因，无权限
                         string[] MCtt = MessageContext.Split(' ');
+                        if (MCtt[0] == "Login")
+                        {
+                            if (MCtt[1].Split("=")[0] == "User" && MCtt[1].Split("=")[1].Split("&")[1] == "Psw")
+                            {
+                                string User = MCtt[1].Split("&")[0].Split("=")[1];
+                                string Psw = MCtt[1].Split("&")[1].Split("=")[1];
+                                if (User == Psw)
+                                {
+                                    TcpServer.Send(ListenEndPoint, (int)SocketID, Encoding.UTF8.GetBytes(Packet.Encapsulation(Encoding.UTF8.GetBytes("Longin 200 OK"))));
+                                }
+                                else
+                                {
+                                    TcpServer.Send(ListenEndPoint, (int)SocketID, Encoding.UTF8.GetBytes(Packet.Encapsulation(Encoding.UTF8.GetBytes("Longin 400 Error Info=密码错误"))));
+                                    TcpServer.Close(ListenEndPoint, (int)SocketID);
+                                }
+                            }
+                        }
+                        if (MCtt[0] == "Select")
+                        {
 
+                        }
+                        if (MCtt[0] == "Map")
+                        {
+
+                        }
                         #endregion
                     }
                 }

@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <Reference Include="TCPCS">
-      <HintPath>..\..\..\dll\TCPCS.dll</HintPath>
+      <HintPath>..\..\..\TCP-IP\TCP·IP\bin\Debug\netcoreapp2.0\TCPCS.dll</HintPath>
     </Reference>
   </ItemGroup>
 
